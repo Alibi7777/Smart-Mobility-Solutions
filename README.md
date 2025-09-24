@@ -8,4 +8,4 @@ We analyze real-world inspired datasets that include road infrastructure, histor
 - Optimize truck delivery scheduling and costs
 - Support decision-making for city planners and logistics managers
 
-<img width="588" height="705" alt="image" src="https://github.com/user-attachments/assets/ec151bf3-c0ab-4a22-81d7-dc2c3c389483" />
+<img width="1369" height="906" alt="Untitled" src="https://github.com/user-attachments/assets/5b87aeb3-4405-4954-a745-d9446b04812a" />
