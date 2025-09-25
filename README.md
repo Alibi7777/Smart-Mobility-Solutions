@@ -9,3 +9,9 @@ We analyze real-world inspired datasets that include road infrastructure, histor
 - Support decision-making for city planners and logistics managers
 
 <img width="1369" height="906" alt="Untitled (1)" src="https://github.com/user-attachments/assets/42823d3f-17e2-4ced-8df6-6985e3981e0c" />
+
+### Running the Python script
+
+1. Install dependencies:
+   ```bash
+   pip install psycopg2
