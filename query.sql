@@ -1,10 +1,3 @@
--- ===========================
--- Gauteng Traffic Analytics
--- queries.sql
--- ===========================
--- This file contains example SQL queries with comments.
--- Each query demonstrates required functionality for the assignment.
--- ===========================
 
 -- 1. Sanity check: preview first 10 rows of roads
 SELECT * FROM gauteng.roads LIMIT 10;
@@ -36,10 +29,6 @@ SELECT d.delivery_id, d.origin_name, d.destination_name,
 FROM gauteng.deliveries d
 JOIN gauteng.truck_profiles t ON d.truck_id = t.truck_id
 LIMIT 10;
-
--- ===========================
--- Analytical Topics (10 queries)
--- ===========================
 
 -- A1. Average speed per road_type
 SELECT r.road_type, AVG(hs.avg_speed_kph) AS avg_speed
@@ -110,6 +99,3 @@ FROM gauteng.incidents
 GROUP BY severity
 ORDER BY severity;
 
--- ===========================
--- END OF FILE
--- ===========================
