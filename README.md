@@ -16,3 +16,14 @@ We analyze real-world inspired datasets that include road infrastructure, histor
    ```bash
    pip install psycopg2
 [dashboard_export_20251018T160207.zip](https://github.com/user-attachments/files/22985527/dashboard_export_20251018T160207.zip)
+
+This folder contains my Apache Superset dashboard export (.json / .yaml file).
+The dashboard includes multiple visualizations, calculated metrics, global filters, and interactive elements created as part of the data visualization and data engineering assignments.
+
+To import it:
+
+Open Superset → Settings → Import Dashboards
+
+Upload the exported file from this repository.
+
+All charts, datasets, and filters will load automatically.
