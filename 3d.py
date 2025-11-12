@@ -207,63 +207,146 @@ def assignment_5_3d_processing():
         print(f"Error in surface clipping: {e}")
         return
 
-    # ========== TASK 7: WORKING WITH COLOR AND EXTREMES ==========
+    # ========== TASK 7: WORKING WITH COLOR AND EXTREMES (FIXED) ==========
     print("\n--- Task 7: Color Gradient and Extremes ---")
     try:
         # Use the original mesh for coloring
         mesh_colored = copy.deepcopy(mesh)
 
-        # Remove original colors and apply Z-axis gradient
+        # 1) Remove original colors and apply Z-axis gradient
         vertices = np.asarray(mesh_colored.vertices)
         z_coords = vertices[:, 2]
         z_min, z_max = np.min(z_coords), np.max(z_coords)
+        z_range = z_max - z_min
 
         # Create color gradient based on Z-axis (blue to red)
         colors = np.zeros((len(vertices), 3))
         for i, z in enumerate(z_coords):
-            normalized_z = (z - z_min) / (z_max - z_min)
-            # Blue (low) to Red (high) gradient
-            colors[i] = [normalized_z, 0.3, 1 - normalized_z]
+            normalized_z = (z - z_min) / z_range if z_range > 0 else 0.5
+            colors[i] = [normalized_z, 0.3, 1 - normalized_z]  # Blue to Red
 
         mesh_colored.vertex_colors = o3d.utility.Vector3dVector(colors)
         mesh_colored.compute_vertex_normals()
 
-        # Find extreme points along Z-axis
+        # 2) Find extreme points along Z-axis
         min_idx = np.argmin(z_coords)
         max_idx = np.argmax(z_coords)
         min_point = vertices[min_idx]
         max_point = vertices[max_idx]
 
-        # Create spheres to highlight extremes
-        min_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.03)
+        print(f"Minimum point found at: {min_point}")
+        print(f"Maximum point found at: {max_point}")
+
+        # 3) Create LARGE VISIBLE markers for extremes
+        # Calculate model scale for proper marker sizing
+        bbox = mesh.get_axis_aligned_bounding_box()
+        extent = bbox.get_extent()
+        model_scale = np.max(extent)
+
+        # Use LARGE markers (20% of model size)
+        marker_size = model_scale * 0.2
+        if marker_size < 0.1:  # Minimum size
+            marker_size = 0.1
+        if marker_size > 0.5:  # Maximum size
+            marker_size = 0.3
+
+        print(f"Using marker size: {marker_size:.3f}")
+
+        # OPTION A: LARGE COLORED SPHERES (most visible)
+        min_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=marker_size)
         min_sphere.translate(min_point)
-        min_sphere.paint_uniform_color([0, 1, 0])  # Green for minimum
+        min_sphere.paint_uniform_color([0.0, 1.0, 0.0])  # Bright green
+        min_sphere.compute_vertex_normals()
 
-        max_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.03)
+        max_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=marker_size)
         max_sphere.translate(max_point)
-        max_sphere.paint_uniform_color([1, 0, 0])  # Red for maximum
+        max_sphere.paint_uniform_color([1.0, 0.0, 0.0])  # Bright red
+        max_sphere.compute_vertex_normals()
 
-        # Create coordinate frame for reference
-        coordinate_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.3)
+        # OPTION B: WIREFRAME CUBES (alternative visibility)
+        min_cube = o3d.geometry.TriangleMesh.create_box(
+            width=marker_size, height=marker_size, depth=marker_size
+        )
+        min_cube.translate(
+            min_point - [marker_size / 2, marker_size / 2, marker_size / 2]
+        )
+        min_cube.paint_uniform_color([0.0, 1.0, 0.0])  # Green
+        min_cube.compute_vertex_normals()
 
-        # Display everything together
-        o3d.visualization.draw_geometries(
-            [mesh_colored, min_sphere, max_sphere, coordinate_frame],
-            window_name="Task 7: Gradient Coloring with Extremes",
+        max_cube = o3d.geometry.TriangleMesh.create_box(
+            width=marker_size, height=marker_size, depth=marker_size
+        )
+        max_cube.translate(
+            max_point - [marker_size / 2, marker_size / 2, marker_size / 2]
+        )
+        max_cube.paint_uniform_color([1.0, 0.0, 0.0])  # Red
+        max_cube.compute_vertex_normals()
+
+        # OPTION C: COORDINATE AXES at extreme points (very clear)
+        min_axes = o3d.geometry.TriangleMesh.create_coordinate_frame(size=marker_size)
+        min_axes.translate(min_point)
+
+        max_axes = o3d.geometry.TriangleMesh.create_coordinate_frame(size=marker_size)
+        max_axes.translate(max_point)
+
+        # 4) Create main coordinate frame
+        main_axes = o3d.geometry.TriangleMesh.create_coordinate_frame(
+            size=marker_size * 1.5
         )
 
-        # Print required information
+        # 5) Display with MULTIPLE HIGHLIGHTING METHODS
+        print("Displaying with LARGE visible markers...")
+
+        # Show with spheres only first
+        o3d.visualization.draw_geometries(
+            [mesh_colored, min_sphere, max_sphere, main_axes],
+            window_name="Task 7: Extremes with LARGE Spheres",
+        )
+
+        # Show with cubes only
+        o3d.visualization.draw_geometries(
+            [mesh_colored, min_cube, max_cube, main_axes],
+            window_name="Task 7: Extremes with LARGE Cubes",
+        )
+
+        # Show with coordinate axes at extremes
+        o3d.visualization.draw_geometries(
+            [mesh_colored, min_axes, max_axes, main_axes],
+            window_name="Task 7: Extremes with Coordinate Axes",
+        )
+
+        # Show ALL markers together (maximum visibility)
+        o3d.visualization.draw_geometries(
+            [
+                mesh_colored,
+                min_sphere,
+                max_sphere,
+                min_cube,
+                max_cube,
+                min_axes,
+                max_axes,
+                main_axes,
+            ],
+            window_name="Task 7: ALL Highlighting Methods",
+        )
+
+        # 6) Print required information
         print(
             f"Z-axis minimum point: ({min_point[0]:.3f}, {min_point[1]:.3f}, {min_point[2]:.3f})"
         )
         print(
             f"Z-axis maximum point: ({max_point[0]:.3f}, {max_point[1]:.3f}, {max_point[2]:.3f})"
         )
-        print(f"Z-axis range: {z_max - z_min:.3f}")
-        print("✓ Color gradient and extremes completed")
+        print(f"Z-axis range: {z_range:.3f}")
+        print(f"Model scale: {model_scale:.3f}")
+        print(f"Marker size used: {marker_size:.3f}")
+        print("✓ Color gradient and extremes with PROPER highlighting completed")
 
     except Exception as e:
         print(f"Error in color and extremes: {e}")
+        import traceback
+
+        traceback.print_exc()
         return
 
     print("\n🎉 === All 7 tasks completed successfully! === 🎉")
