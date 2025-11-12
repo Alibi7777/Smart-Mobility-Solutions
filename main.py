@@ -1,5 +1,5 @@
 import psycopg2
-from config import get_engine, get_connection
+from app_config import get_engine, get_connection
 
 conn = get_connection()
 

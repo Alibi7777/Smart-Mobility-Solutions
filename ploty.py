@@ -1,7 +1,7 @@
 import pandas as pd
 import plotly.express as px
 from sqlalchemy import create_engine
-from config import get_engine, get_connection
+from app_config import get_engine, get_connection
 
 engine = get_engine()
 conn = get_connection()
